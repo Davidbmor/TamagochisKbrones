@@ -36,10 +36,16 @@ io.on('connection', (socket) => {
 
     socket.on('addPlayer', () => {
         const room = RoomService.getInstance().addPlayer(player);
+        socket.join(room.name as string);
         socket.emit('playerAdded', {
-            message: 'Player added successfully in the room',
-            roomName: room.name,
-            roomSize: room.players.length,
+            message: `Player added successfully in the room: 
+            ${room.name} , size room : ${room.players.length}`,
+          
+        });
+
+        io.to(room.name as string).emit('newPlayer', {
+            message: `A new player has joined the room: ${room.name} , size room : ${room.players.length}`,
+    
         });
     });
 

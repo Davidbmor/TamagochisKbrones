@@ -15,10 +15,13 @@ socket.on("connection", (data) => {
 
 
 socket.on("playerAdded", (dato) => {
-    console.log(dato.meesage);
+    console.log( dato.message);
 });
 
-
+socket.on("newPlayer", (dato) => {
+    console.log(dato.message);
+   
+});
 
 console.log(socket);
 
