@@ -6,7 +6,18 @@ socket.on("connection", (data) => {
     socket.on("respuesta", (dato) => {
         console.log(dato);
     });
+
+    socket.emit("addPlayer", () => {
+    });
+
 });
+
+
+
+socket.on("playerAdded", (dato) => {
+    console.log(dato.meesage);
+});
+
 
 
 console.log(socket);

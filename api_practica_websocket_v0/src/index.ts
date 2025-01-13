@@ -7,13 +7,12 @@ import { Server } from 'socket.io';
 import { Player } from './player/entities/Player';
 import { RoomService } from './room/RoomService';
 
-
 dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
-const httpServer = http.createServer();
+const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
     cors: {
@@ -25,32 +24,36 @@ const io = new Server(httpServer, {
 io.on('connection', (socket) => {
     console.log('Un cliente se ha conectado:', socket.id);
     socket.emit("connection", { status: true });
-    const player : Player = {
+
+    const player: Player = {
         id: socket,
         x: 0,
         y: 0,
         status: 0,
         direction: 0,
         visibility: true
-    }
-    RoomService.getInstance().addPlayer(player);
-    
-   /* socket.on('mensaje', (data) => {
-        console.log('Mensaje recibido:', data);
-        socket.emit('respuesta', { mensaje: 'Mensaje recibido con éxito.' });
-    });*/
+    };
+
+    socket.on('addPlayer', () => {
+        const room = RoomService.getInstance().addPlayer(player);
+        socket.emit('playerAdded', {
+            message: 'Player added successfully in the room',
+            roomName: room.name,
+            roomSize: room.players.length,
+        });
+    });
+
     socket.on('disconnect', () => {
+
         console.log('Un cliente se ha desconectado:', socket.id);
     });
 });
-
 
 app.get('/', async (req: Request, res: Response): Promise<Response> => {
     return res.status(200).send({
         message: 'Hello World!',
     });
 });
-
 
 try {
     httpServer.listen(PORT, (): void => {
@@ -59,4 +62,3 @@ try {
 } catch (error: any) {
     console.error(`Error occurred: ${error.message}`);
 }
-
